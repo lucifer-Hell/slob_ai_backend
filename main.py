@@ -4,8 +4,28 @@ import torch
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModelForSequenceClassification,AutoConfig
 
-# === Model + Tokenizer Setup ===
-import os
+
+import requests
+
+MODEL_URL = "https://github.com/lucifer-Hell/slob_ai_backend/releases/download/safe_tensor/model.safetensors"
+MODEL_PATH_TO_ADD = "model/slobp/model.safetensors"
+
+def download_model_if_not_exists():
+    if not os.path.exists(MODEL_PATH_TO_ADD):
+        print("🔄 Downloading model...")
+        os.makedirs(os.path.dirname(MODEL_PATH_TO_ADD), exist_ok=True)
+        with requests.get(MODEL_URL, stream=True) as r:
+            r.raise_for_status()
+            with open(MODEL_PATH_TO_ADD, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+        print("✅ Model downloaded.")
+    else:
+        print("✅ Model already exists.")
+
+# Call this early in your backend startup (e.g. __main__ or FastAPI startup event)
+download_model_if_not_exists()
+
 MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "./model/slobp"))
 LABELS_CSV =os.path.abspath(os.path.join(os.path.dirname(__file__), "./data/CATEGORIES.csv"))
 
