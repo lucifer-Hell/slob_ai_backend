@@ -2,3 +2,4 @@
 .idea
 temp
 /model/slobp/model.safetensors
+/sample_suppliers.csv
